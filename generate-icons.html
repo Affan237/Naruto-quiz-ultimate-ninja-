@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Naruto Quiz Icon Generator</title>
+<style>body{background:#111;color:#fff;font-family:sans-serif;padding:20px;text-align:center}</style>
+</head>
+<body>
+<h2>🍥 Naruto Quiz Icon Generator</h2>
+<p>Click each button to download the icon at that size. Save all into an <strong>icons/</strong> folder.</p>
+<div id="btns"></div>
+<canvas id="c" style="display:none"></canvas>
+<script>
+const sizes = [72,96,128,144,152,192,384,512];
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+function drawIcon(size) {
+  canvas.width = size; canvas.height = size;
+  const cx = size/2, cy = size/2, r = size/2;
+
+  // Background rounded rect
+  const bg = ctx.createRadialGradient(cx,cy,0,cx,cy,r);
+  bg.addColorStop(0,'#1a0a00'); bg.addColorStop(1,'#0a0005');
+  const rr = size*0.22;
+  ctx.beginPath();
+  ctx.moveTo(rr,0); ctx.lineTo(size-rr,0);
+  ctx.quadraticCurveTo(size,0,size,rr);
+  ctx.lineTo(size,size-rr);
+  ctx.quadraticCurveTo(size,size,size-rr,size);
+  ctx.lineTo(rr,size); ctx.quadraticCurveTo(0,size,0,size-rr);
+  ctx.lineTo(0,rr); ctx.quadraticCurveTo(0,0,rr,0);
+  ctx.closePath(); ctx.fillStyle=bg; ctx.fill();
+
+  // Outer orange ring
+  ctx.beginPath(); ctx.arc(cx,cy,r*0.88,0,Math.PI*2);
+  ctx.strokeStyle='rgba(255,107,0,0.7)'; ctx.lineWidth=size*0.022; ctx.stroke();
+
+  // Gold ring
+  ctx.beginPath(); ctx.arc(cx,cy,r*0.80,0,Math.PI*2);
+  ctx.strokeStyle='rgba(255,215,0,0.35)'; ctx.lineWidth=size*0.008; ctx.stroke();
+
+  // Sharingan eye
+  const eyeG = ctx.createRadialGradient(cx,cy,0,cx,cy,r*0.70);
+  eyeG.addColorStop(0,'#e63000'); eyeG.addColorStop(0.6,'#8b0000'); eyeG.addColorStop(1,'#3d0000');
+  ctx.beginPath(); ctx.arc(cx,cy,r*0.70,0,Math.PI*2);
+  ctx.fillStyle=eyeG; ctx.fill();
+
+  // Dashed inner ring
+  ctx.beginPath(); ctx.arc(cx,cy,r*0.60,0,Math.PI*2);
+  ctx.strokeStyle='rgba(204,17,0,0.4)'; ctx.lineWidth=size*0.006;
+  ctx.setLineDash([size*0.04,size*0.025]); ctx.stroke(); ctx.setLineDash([]);
+
+  // Pupil
+  const pupG = ctx.createRadialGradient(cx,cy,0,cx,cy,r*0.28);
+  pupG.addColorStop(0,'#1a0a1a'); pupG.addColorStop(1,'#0a0010');
+  ctx.beginPath(); ctx.arc(cx,cy,r*0.28,0,Math.PI*2);
+  ctx.fillStyle=pupG; ctx.fill();
+
+  // 3 Tomoe
+  for(let i=0;i<3;i++){
+    ctx.save();
+    ctx.translate(cx,cy); ctx.rotate((i*120)*Math.PI/180); ctx.translate(0,-r*0.40);
+    ctx.beginPath(); ctx.arc(0,0,r*0.10,0,Math.PI*2);
+    ctx.fillStyle='#0a0010'; ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(0,r*0.10);
+    ctx.quadraticCurveTo(r*0.12,r*0.20,r*0.06,r*0.29);
+    ctx.quadraticCurveTo(0,r*0.22,-r*0.06,r*0.29);
+    ctx.quadraticCurveTo(-r*0.12,r*0.20,0,r*0.10);
+    ctx.fillStyle='#0a0010'; ctx.fill();
+    ctx.restore();
+  }
+
+  // Shine
+  ctx.beginPath(); ctx.arc(cx-r*0.10,cy-r*0.08,r*0.05,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,255,255,0.14)'; ctx.fill();
+
+  // Bottom band
+  ctx.fillStyle='rgba(10,10,16,0.80)';
+  ctx.fillRect(0,size*0.78,size,size*0.22);
+  ctx.fillStyle='rgba(255,107,0,0.9)';
+  ctx.fillRect(0,size*0.78,size,size*0.012);
+
+  // Text
+  ctx.textAlign='center';
+  ctx.font=`bold ${size*0.072}px Georgia,serif`;
+  ctx.fillStyle='#ff6b00'; ctx.letterSpacing='2px';
+  ctx.fillText('ULTIMATE',cx,size*0.875);
+  ctx.font=`${size*0.055}px Georgia,serif`;
+  ctx.fillStyle='#ffd700';
+  ctx.fillText('NINJA',cx,size*0.945);
+}
+
+const div = document.getElementById('btns');
+sizes.forEach(sz => {
+  const btn = document.createElement('button');
+  btn.textContent = `Download ${sz}x${sz}`;
+  btn.style.cssText='margin:6px;padding:10px 16px;background:#ff6b00;border:none;color:#fff;border-radius:6px;cursor:pointer;font-size:14px';
+  btn.onclick = () => {
+    drawIcon(sz);
+    const a = document.createElement('a');
+    a.download = `icon-${sz}x${sz}.png`;
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  };
+  div.appendChild(btn);
+});
+
+// Also show preview
+const preview = document.createElement('div');
+preview.style.marginTop='20px';
+[64,128,256].forEach(sz => {
+  drawIcon(sz);
+  const img = document.createElement('img');
+  img.src = canvas.toDataURL('image/png');
+  img.style.cssText=`width:${sz}px;height:${sz}px;margin:10px;border-radius:${sz*0.22}px`;
+  preview.appendChild(img);
+});
+document.body.appendChild(preview);
+</script>
+</body>
+</html>
